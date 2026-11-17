@@ -1,0 +1,43 @@
+# Regenerate SPMSmoke.xcodeproj with `xcodegen generate` (XcodeGen 2.46+). The generated project is committed so CI
+# and partners can build without XcodeGen.
+name: SPMSmoke
+options:
+  bundleIdPrefix: vn.payme
+  deploymentTarget:
+    iOS: "15.0"
+packages:
+  PayMEMiniApp:
+    path: ../..
+targets:
+  SPMSmoke:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources: [Sources]
+    dependencies:
+      - package: PayMEMiniApp
+        product: PayMEMiniApp
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+        NSCameraUsageDescription: SPMSmoke uses the camera for eKYC and QR scanning.
+        NSPhotoLibraryUsageDescription: SPMSmoke picks QR images from the photo library.
+        NSPhotoLibraryAddUsageDescription: SPMSmoke saves QR images to the photo library.
+        NSFaceIDUsageDescription: SPMSmoke uses Face ID to confirm transactions.
+        NFCReaderUsageDescription: SPMSmoke reads the ID card chip for eKYC.
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: vn.payme.SPMSmoke
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGNING_ALLOWED: NO
+schemes:
+  SPMSmoke:
+    build:
+      targets:
+        SPMSmoke: all
