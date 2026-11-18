@@ -1,4 +1,4 @@
-# PayME Miniapp iOS SDK: Swift Package Manager (preview)
+# PayME Miniapp iOS SDK: Swift Package Manager
 
 [Tiếng Việt](#tiếng-việt) | [English](#english)
 
@@ -6,29 +6,28 @@
 
 Gói SwiftPM của [PayME Miniapp iOS SDK](https://github.com/PayME-Miniapp/native-ios). Hướng dẫn tích hợp, cấu hình `Info.plist` và API: xem [README của native-ios](https://github.com/PayME-Miniapp/native-ios/blob/main/README.md).
 
-> **Preview.** SPM đang ở bản thử từ 0.14.1. CocoaPods vẫn là cách cài được khuyến nghị cho tới bản SPM chính thức.
+> Từ 0.15.0, Swift Package Manager là cách cài được khuyến nghị. CocoaPods (qua repo spec của PayME) vẫn được hỗ trợ ít nhất tới 11/2027.
 
 ### Yêu cầu
 
 - Xcode 26.2 trở lên. iOS 13.0 trở lên.
-- Dùng **`lottie-spm`** (không dùng `airbnb/lottie-ios` dạng source) và **`iProov/ios-spm`** (không dùng `iProov/ios`). SwiftPM báo lỗi khi hai package có cùng tên product/module, nên ứng dụng đã khai báo `lottie-ios` hay `iProov/ios` phải đổi sang hai package trên.
-- Ứng dụng đã nhúng bất kỳ bản GCDWebServer nào (pod hay package SPM) thì **chưa dùng được bản preview**: gói này mang theo `GCDWebServer.xcframework` riêng. Hãy tiếp tục dùng CocoaPods.
+- Dùng **`lottie-spm`** (không dùng `airbnb/lottie-ios` dạng source) và **`iProov/ios-spm`** (không dùng `iProov/ios`). SwiftPM báo lỗi khi hai package có cùng tên product/module (`multiple packages ('lottie-ios', 'lottie-spm') declare targets with a conflicting name: 'Lottie'`, `multiple similar targets 'iProov', 'iProovTargets' appear in package 'ios' and 'ios-spm'`), nên ứng dụng đã khai báo `lottie-ios` hay `iProov/ios` phải đổi sang hai package trên.
 
 ### Cài đặt
 
-Xcode → **File → Add Package Dependencies…** → `https://github.com/PayME-Miniapp/payme-miniapp-spm.git`, chọn **Up to Next Minor Version** từ `0.14.1`, rồi thêm product `PayMEMiniApp` vào target ứng dụng.
+Xcode → **File → Add Package Dependencies…** → `https://github.com/PayME-Miniapp/payme-miniapp-spm.git`, chọn **Up to Next Minor Version** từ `0.15.0`, rồi thêm product `PayMEMiniApp` vào target ứng dụng.
 
 Hoặc trong `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/PayME-Miniapp/payme-miniapp-spm.git", .upToNextMinor(from: "0.14.1")),
+.package(url: "https://github.com/PayME-Miniapp/payme-miniapp-spm.git", .upToNextMinor(from: "0.15.0")),
 // ...
 .product(name: "PayMEMiniApp", package: "payme-miniapp-spm"),
 ```
 
 Dùng `.upToNextMinor`, không dùng `from:`: với bản 0.x, `from:` sẽ nhận cả bản minor mới có thay đổi phá vỡ.
 
-Gói tự kéo theo Lottie 4.6.1 (`lottie-spm`), KalapaEkycSDK 2.8.x và iProov 12.5.0 (`iProov/ios-spm`). Binary `PayMEMiniApp.xcframework.zip` và `GCDWebServer.xcframework.zip` là asset của [GitHub Release](https://github.com/PayME-Miniapp/native-ios/releases) trên native-ios, cùng zip và cùng sha256 với pod `PayME-Miniapp`.
+Gói tự kéo theo Lottie 4.6.1 (`lottie-spm`), KalapaEkycSDK 2.8.x và iProov 12.5.0 (`iProov/ios-spm`). Binary `PayMEMiniApp.xcframework.zip` là asset của [GitHub Release](https://github.com/PayME-Miniapp/native-ios/releases) trên native-ios, cùng zip và cùng sha256 với pod `PayME-Miniapp`.
 
 ### Ví dụ
 
@@ -41,35 +40,34 @@ xcodebuild build -project Examples/SPMSmoke/SPMSmoke.xcodeproj -scheme SPMSmoke 
 
 ### Giấy phép
 
-MIT (`LICENSE`). Phần mềm bên thứ ba trong binary: `NOTICE` (GCDWebServer BSD, SwiftyRSA MIT, ZIPFoundation MIT).
+MIT (`LICENSE`). Phần mềm bên thứ ba trong binary: `NOTICE` (SwiftyRSA MIT, ZIPFoundation MIT).
 
 ## English
 
 Swift Package Manager package for the [PayME Miniapp iOS SDK](https://github.com/PayME-Miniapp/native-ios). Integration guide, `Info.plist` setup and API: see the [native-ios README](https://github.com/PayME-Miniapp/native-ios/blob/main/README.en.md).
 
-> **Preview.** SPM support is a preview starting with 0.14.1. CocoaPods remains the recommended installation until the SPM release is final.
+> From 0.15.0, Swift Package Manager is the recommended installation. CocoaPods (through PayME's spec repo) stays supported at least until November 2027.
 
 ### Requirements
 
 - Xcode 26.2 or later. iOS 13.0 or later.
-- Use **`lottie-spm`** (not `airbnb/lottie-ios` from source) and **`iProov/ios-spm`** (not `iProov/ios`). SwiftPM fails when two packages vend the same product/module name, so an app that already depends on `lottie-ios` or `iProov/ios` must switch to these packages.
-- Apps that already embed any GCDWebServer (pod or SPM package) **cannot use the preview yet**: this package ships its own `GCDWebServer.xcframework`. Keep using CocoaPods.
+- Use **`lottie-spm`** (not `airbnb/lottie-ios` from source) and **`iProov/ios-spm`** (not `iProov/ios`). SwiftPM fails when two packages vend the same product/module name (`multiple packages ('lottie-ios', 'lottie-spm') declare targets with a conflicting name: 'Lottie'`, `multiple similar targets 'iProov', 'iProovTargets' appear in package 'ios' and 'ios-spm'`), so an app that already depends on `lottie-ios` or `iProov/ios` must switch to these packages.
 
 ### Installation
 
-Xcode → **File → Add Package Dependencies…** → `https://github.com/PayME-Miniapp/payme-miniapp-spm.git`, choose **Up to Next Minor Version** from `0.14.1`, then add the `PayMEMiniApp` product to your app target.
+Xcode → **File → Add Package Dependencies…** → `https://github.com/PayME-Miniapp/payme-miniapp-spm.git`, choose **Up to Next Minor Version** from `0.15.0`, then add the `PayMEMiniApp` product to your app target.
 
 Or in `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/PayME-Miniapp/payme-miniapp-spm.git", .upToNextMinor(from: "0.14.1")),
+.package(url: "https://github.com/PayME-Miniapp/payme-miniapp-spm.git", .upToNextMinor(from: "0.15.0")),
 // ...
 .product(name: "PayMEMiniApp", package: "payme-miniapp-spm"),
 ```
 
 Use `.upToNextMinor`, not `from:`: for 0.x versions, `from:` also accepts new minor versions with breaking changes.
 
-The package brings Lottie 4.6.1 (`lottie-spm`), KalapaEkycSDK 2.8.x and iProov 12.5.0 (`iProov/ios-spm`). The `PayMEMiniApp.xcframework.zip` and `GCDWebServer.xcframework.zip` binaries are assets of the native-ios [GitHub Release](https://github.com/PayME-Miniapp/native-ios/releases): the same zip and sha256 as the `PayME-Miniapp` pod.
+The package brings Lottie 4.6.1 (`lottie-spm`), KalapaEkycSDK 2.8.x and iProov 12.5.0 (`iProov/ios-spm`). The `PayMEMiniApp.xcframework.zip` binary is an asset of the native-ios [GitHub Release](https://github.com/PayME-Miniapp/native-ios/releases): the same zip and sha256 as the `PayME-Miniapp` pod.
 
 ### Example
 
@@ -82,4 +80,4 @@ xcodebuild build -project Examples/SPMSmoke/SPMSmoke.xcodeproj -scheme SPMSmoke 
 
 ### License
 
-MIT (`LICENSE`). Third-party software in the binaries: `NOTICE` (GCDWebServer BSD, SwiftyRSA MIT, ZIPFoundation MIT).
+MIT (`LICENSE`). Third-party software in the binaries: `NOTICE` (SwiftyRSA MIT, ZIPFoundation MIT).
