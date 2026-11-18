@@ -99,7 +99,7 @@ jobs:
           app="$RUNNER_TEMP/dd/Build/Products/Debug-iphonesimulator/SPMSmoke.app"
           got="$(ls "$app/Frameworks" | LC_ALL=C sort | tr '\n' ' ')"
           echo "Frameworks: $got"
-          test "$got" = "KalapaSDK.framework Lottie.framework PayMEMiniApp.framework iProov.framework "
+          test "$got" = "KalapaSDK.framework PayMEMiniApp.framework iProov.framework "
           # Every @rpath framework PayMEMiniApp loads must be embedded.
           for lib in $(otool -L "$app/Frameworks/PayMEMiniApp.framework/PayMEMiniApp" | awk 'NR>1 {print $1}' | grep '^@rpath/.*\.framework/' | sort -u); do
             test -e "$app/Frameworks/${lib#@rpath/}" || { echo "missing $lib"; exit 1; }

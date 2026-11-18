@@ -11,23 +11,23 @@ Gói SwiftPM của [PayME Miniapp iOS SDK](https://github.com/PayME-Miniapp/nati
 ### Yêu cầu
 
 - Xcode 26.2 trở lên. iOS 13.0 trở lên.
-- Dùng **`lottie-spm`** (không dùng `airbnb/lottie-ios` dạng source) và **`iProov/ios-spm`** (không dùng `iProov/ios`). SwiftPM báo lỗi khi hai package có cùng tên product/module (`multiple packages ('lottie-ios', 'lottie-spm') declare targets with a conflicting name: 'Lottie'`, `multiple similar targets 'iProov', 'iProovTargets' appear in package 'ios' and 'ios-spm'`), nên ứng dụng đã khai báo `lottie-ios` hay `iProov/ios` phải đổi sang hai package trên.
+- Ứng dụng tự dùng iProov thì dùng **`iProov/ios-spm`** (không dùng `iProov/ios`), nếu không SwiftPM báo lỗi `multiple similar targets 'iProov', 'iProovTargets' appear in package 'ios' and 'ios-spm'`. Từ 0.16.0 gói không dùng Lottie: ứng dụng dùng Lottie bản nào, cài kiểu nào cũng được.
 
 ### Cài đặt
 
-Xcode → **File → Add Package Dependencies…** → `https://github.com/PayME-Miniapp/payme-miniapp-spm.git`, chọn **Up to Next Minor Version** từ `0.15.0`, rồi thêm product `PayMEMiniApp` vào target ứng dụng.
+Xcode → **File → Add Package Dependencies…** → `https://github.com/PayME-Miniapp/payme-miniapp-spm.git`, chọn **Up to Next Minor Version** từ `0.16.0`, rồi thêm product `PayMEMiniApp` vào target ứng dụng.
 
 Hoặc trong `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/PayME-Miniapp/payme-miniapp-spm.git", .upToNextMinor(from: "0.15.0")),
+.package(url: "https://github.com/PayME-Miniapp/payme-miniapp-spm.git", .upToNextMinor(from: "0.16.0")),
 // ...
 .product(name: "PayMEMiniApp", package: "payme-miniapp-spm"),
 ```
 
 Dùng `.upToNextMinor`, không dùng `from:`: với bản 0.x, `from:` sẽ nhận cả bản minor mới có thay đổi phá vỡ.
 
-Gói tự kéo theo Lottie 4.6.1 (`lottie-spm`), KalapaEkycSDK 2.8.x và iProov 12.5.0 (`iProov/ios-spm`). Binary `PayMEMiniApp.xcframework.zip` là asset của [GitHub Release](https://github.com/PayME-Miniapp/native-ios/releases) trên native-ios, cùng zip và cùng sha256 với pod `PayME-Miniapp`.
+Gói tự kéo theo KalapaEkycSDK 2.8.x và iProov 12.5.0 (`iProov/ios-spm`). Binary `PayMEMiniApp.xcframework.zip` là asset của [GitHub Release](https://github.com/PayME-Miniapp/native-ios/releases) trên native-ios, cùng zip và cùng sha256 với pod `PayME-Miniapp`.
 
 ### Ví dụ
 
@@ -51,23 +51,23 @@ Swift Package Manager package for the [PayME Miniapp iOS SDK](https://github.com
 ### Requirements
 
 - Xcode 26.2 or later. iOS 13.0 or later.
-- Use **`lottie-spm`** (not `airbnb/lottie-ios` from source) and **`iProov/ios-spm`** (not `iProov/ios`). SwiftPM fails when two packages vend the same product/module name (`multiple packages ('lottie-ios', 'lottie-spm') declare targets with a conflicting name: 'Lottie'`, `multiple similar targets 'iProov', 'iProovTargets' appear in package 'ios' and 'ios-spm'`), so an app that already depends on `lottie-ios` or `iProov/ios` must switch to these packages.
+- If your app uses iProov itself, use **`iProov/ios-spm`** (not `iProov/ios`); otherwise SwiftPM fails with `multiple similar targets 'iProov', 'iProovTargets' appear in package 'ios' and 'ios-spm'`. From 0.16.0 the package does not use Lottie: your app can use any Lottie version, installed any way.
 
 ### Installation
 
-Xcode → **File → Add Package Dependencies…** → `https://github.com/PayME-Miniapp/payme-miniapp-spm.git`, choose **Up to Next Minor Version** from `0.15.0`, then add the `PayMEMiniApp` product to your app target.
+Xcode → **File → Add Package Dependencies…** → `https://github.com/PayME-Miniapp/payme-miniapp-spm.git`, choose **Up to Next Minor Version** from `0.16.0`, then add the `PayMEMiniApp` product to your app target.
 
 Or in `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/PayME-Miniapp/payme-miniapp-spm.git", .upToNextMinor(from: "0.15.0")),
+.package(url: "https://github.com/PayME-Miniapp/payme-miniapp-spm.git", .upToNextMinor(from: "0.16.0")),
 // ...
 .product(name: "PayMEMiniApp", package: "payme-miniapp-spm"),
 ```
 
 Use `.upToNextMinor`, not `from:`: for 0.x versions, `from:` also accepts new minor versions with breaking changes.
 
-The package brings Lottie 4.6.1 (`lottie-spm`), KalapaEkycSDK 2.8.x and iProov 12.5.0 (`iProov/ios-spm`). The `PayMEMiniApp.xcframework.zip` binary is an asset of the native-ios [GitHub Release](https://github.com/PayME-Miniapp/native-ios/releases): the same zip and sha256 as the `PayME-Miniapp` pod.
+The package brings KalapaEkycSDK 2.8.x and iProov 12.5.0 (`iProov/ios-spm`). The `PayMEMiniApp.xcframework.zip` binary is an asset of the native-ios [GitHub Release](https://github.com/PayME-Miniapp/native-ios/releases): the same zip and sha256 as the `PayME-Miniapp` pod.
 
 ### Example
 
