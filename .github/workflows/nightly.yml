@@ -1,0 +1,106 @@
+name: Nightly SPM smoke
+
+# Resolves this package from the real release URLs and builds Examples/SPMSmoke for the simulator.
+# The KalapaEkycSDK binary is downloaded from raw.githubusercontent.com, which can answer HTTP 429: third-party
+# binaries come from a SwiftPM cache and the resolve is retried. The PayME binaries are always downloaded from the
+# release (checked against the checksums in Package.swift first) and never taken from the cache.
+
+on:
+  schedule:
+    - cron: '0 19 * * *' # 02:00 Asia/Ho_Chi_Minh
+  workflow_dispatch:
+    inputs:
+      fresh_cache:
+        description: Ignore the SwiftPM cache and download every package and binary
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-spm-smoke
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
+      PROJECT: Examples/SPMSmoke/SPMSmoke.xcodeproj
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Xcode 26.2
+        run: |
+          if [ ! -d "$DEVELOPER_DIR" ]; then
+            echo "Xcode 26.2 not found at $DEVELOPER_DIR. Installed:"; ls -d /Applications/Xcode*.app
+            exit 1
+          fi
+          xcodebuild -version
+          echo "SPM_CACHE=$HOME/spm-cache" >> "$GITHUB_ENV"
+          echo "SPM_CHECKOUTS=$RUNNER_TEMP/spm-checkouts" >> "$GITHUB_ENV"
+
+      - name: Release assets match Package.swift
+        run: |
+          v="$(sed -n 's/^let v = "\(.*\)"$/\1/p' Package.swift)"
+          test -n "$v"
+          for name in PayMEMiniApp; do
+            want="$(awk -v n="$name" '/\.binaryTarget\(/ {b=1} b && index($0, "name: \"" n "\"") {f=1} f && /checksum:/ {gsub(/.*checksum: "|".*/, ""); print; exit}' Package.swift)"
+            url="https://github.com/PayME-Miniapp/native-ios/releases/download/$v/$name.xcframework.zip"
+            curl -fsSL --retry 5 --retry-all-errors --retry-delay 10 -o "$RUNNER_TEMP/$name.zip" "$url"
+            got="$(swift package compute-checksum "$RUNNER_TEMP/$name.zip")"
+            echo "$name $v: Package.swift $want, release $got"
+            test -n "$want" && test "$want" = "$got"
+          done
+
+      - name: Restore SwiftPM cache
+        id: cache
+        if: ${{ !inputs.fresh_cache }}
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/spm-cache
+          key: spm-${{ runner.os }}-${{ hashFiles('Package.swift') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      - name: Resolve packages (retries for HTTP 429)
+        run: |
+          # The PayME binaries always come from the release, never from the cache.
+          rm -rf "$SPM_CACHE"/artifacts/*PayME_Miniapp_native_ios*
+          for attempt in 1 2 3 4; do
+            rm -rf "$SPM_CHECKOUTS"
+            if xcodebuild -resolvePackageDependencies -project "$PROJECT" \
+                 -clonedSourcePackagesDirPath "$SPM_CHECKOUTS" -packageCachePath "$SPM_CACHE"; then
+              exit 0
+            fi
+            echo "resolve attempt $attempt failed"
+            [ "$attempt" = 4 ] || sleep $((attempt * 90))
+          done
+          exit 1
+
+      - name: Save SwiftPM cache
+        if: ${{ !inputs.fresh_cache && steps.cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ~/spm-cache
+          key: spm-${{ runner.os }}-${{ hashFiles('Package.swift') }}
+
+      - name: Build SPMSmoke (simulator)
+        run: |
+          xcodebuild build -project "$PROJECT" -scheme SPMSmoke \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/dd" \
+            -clonedSourcePackagesDirPath "$SPM_CHECKOUTS" -packageCachePath "$SPM_CACHE" \
+            -skipPackageUpdates CODE_SIGNING_ALLOWED=NO
+
+      - name: Embedded frameworks
+        run: |
+          app="$RUNNER_TEMP/dd/Build/Products/Debug-iphonesimulator/SPMSmoke.app"
+          got="$(ls "$app/Frameworks" | LC_ALL=C sort | tr '\n' ' ')"
+          echo "Frameworks: $got"
+          test "$got" = "KalapaSDK.framework Lottie.framework PayMEMiniApp.framework iProov.framework "
+          # Every @rpath framework PayMEMiniApp loads must be embedded.
+          for lib in $(otool -L "$app/Frameworks/PayMEMiniApp.framework/PayMEMiniApp" | awk 'NR>1 {print $1}' | grep '^@rpath/.*\.framework/' | sort -u); do
+            test -e "$app/Frameworks/${lib#@rpath/}" || { echo "missing $lib"; exit 1; }
+          done
